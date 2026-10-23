@@ -9,10 +9,14 @@ Built as a static React app for **Cloudflare Pages free tier**.
 
 ![The shared check](docs/preview-result.png)
 
+![The fast-start builder](docs/preview-builder.png)
+
 ## What it does
 
+- Start with the bill amount; a live equal-share preview appears immediately in the panel and the thumb bar.
 - Add 2–12 people by name.
-- Enter the bill as one total, or item by item.
+- The next-step button always names the one missing input (bill, table, item assignment, allocation) and jumps to it.
+- Enter the bill as one total, or switch to item by item as a secondary action; by-item is selected automatically when you do.
 - Add tip and tax (percentage or amount); tip is calculated on the subtotal.
 - Split equally, by custom final amounts, by percentage, or by item (shared items included).
 - Choose who paid; the result lists each share and the fewest transfers needed to settle.
@@ -39,7 +43,7 @@ npm run dev
 Open http://127.0.0.1:5173.
 
 ```bash
-npm test        # 22 unit tests for money, splitting, rounding, and transfers
+npm test        # 24 unit tests for money, splitting, rounding, and transfers
 npm run build   # typecheck + production build into dist/
 npm run preview # serve the production build
 ```

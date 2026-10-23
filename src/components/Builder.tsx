@@ -22,12 +22,21 @@ export function Builder({
   const [loadError] = useState(() => Boolean(initialData) && decodeState(initialData) === null);
   const model = useMemo(() => computeSplit(state), [state]);
   const ready = model.issues.length === 0;
-  const nextStep =
-    model.issues[0]?.target === 'people'
-      ? 'Add the table'
-      : model.issues[0]?.target === 'bill'
-        ? 'Add the bill'
-        : model.issues[0]?.target === 'items'
+  const firstTarget = model.issues[0]?.target;
+  const shareCents = state.people.map((person) => model.shares[person.id] ?? 0);
+  const showEach = model.effectiveSplit === 'equal' && model.totals.total > 0 && shareCents.length > 0;
+  const minShare = showEach ? Math.min(...shareCents) : 0;
+  const maxShare = showEach ? Math.max(...shareCents) : 0;
+
+  const ctaLabel = ready
+    ? 'Review the split'
+    : firstTarget === 'bill'
+      ? state.mode === 'items'
+        ? 'Add an item'
+        : 'Add the bill total'
+      : firstTarget === 'people'
+        ? 'Add the table'
+        : firstTarget === 'items'
           ? 'Assign every item'
           : 'Finish the split';
 
@@ -44,9 +53,43 @@ export function Builder({
     navigate(`/s/${encoded}`);
   };
 
+  const goToNextStep = () => {
+    const behaviour = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+
+    if (firstTarget === 'bill') {
+      const target =
+        state.mode === 'items'
+          ? document.getElementById('bill-add-item')
+          : document.getElementById('bill-amount');
+      target?.scrollIntoView({ behavior: behaviour, block: 'center' });
+      if (target instanceof HTMLElement) target.focus({ preventScroll: true });
+      return;
+    }
+
+    if (firstTarget === 'people') {
+      const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('.person-name'));
+      const input = inputs.find((entry) => entry.value.trim() === '') ?? inputs[0];
+      input?.scrollIntoView({ behavior: behaviour, block: 'center' });
+      input?.focus({ preventScroll: true });
+      return;
+    }
+
+    if (firstTarget === 'items') {
+      document.querySelector('.item-row.is-unassigned')?.scrollIntoView({ behavior: behaviour, block: 'center' });
+      return;
+    }
+
+    document.querySelector('.allocation')?.scrollIntoView({ behavior: behaviour, block: 'center' });
+  };
+
+  const primaryAction = () => {
+    if (ready) review();
+    else goToNextStep();
+  };
+
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    review();
+    primaryAction();
   };
 
   const startOver = () => {
@@ -71,8 +114,7 @@ export function Builder({
               </h1>
               <div className="hero-aside">
                 <p>
-                  One bill, a few friends, and a link that carries every share. Tip, tax, and the
-                  last cent are settled before the plates are cleared.
+                  Start with the bill. Add the table. Share one link. Every cent settles itself.
                 </p>
                 <span className="hero-stamp">
                   <LockIcon size={14} />
@@ -90,12 +132,18 @@ export function Builder({
 
           <div className="workspace">
             <form id="builder-form" className="editor" onSubmit={onSubmit} noValidate>
-              <PeopleEditor state={state} setState={setState} model={model} />
               <BillEditor state={state} setState={setState} model={model} />
+              <PeopleEditor state={state} setState={setState} />
               <SplitEditor state={state} setState={setState} model={model} />
             </form>
 
-            <TallyPanel state={state} model={model} onReview={review} />
+            <TallyPanel
+              state={state}
+              model={model}
+              ready={ready}
+              ctaLabel={ctaLabel}
+              onAction={primaryAction}
+            />
           </div>
 
           <footer className="site-footer">
@@ -114,10 +162,19 @@ export function Builder({
         <div className="mobile-total">
           <span>Total</span>
           <strong>{formatMoney(model.totals.total)}</strong>
-          {!ready ? <em>{nextStep}</em> : null}
+          {showEach ? (
+            <small className="mobile-each">
+              {minShare === maxShare ? formatMoney(minShare) : `${formatMoney(minShare)}–${formatMoney(maxShare)}`}{' '}
+              each
+            </small>
+          ) : null}
         </div>
-        <button type="button" className="btn btn-primary" onClick={review} disabled={!ready}>
-          Review the split
+        <button
+          type="button"
+          className={`btn ${ready ? 'btn-primary' : 'btn-next'}`}
+          onClick={primaryAction}
+        >
+          {ctaLabel}
           <ArrowRightIcon size={18} />
         </button>
       </aside>

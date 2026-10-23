@@ -36,18 +36,21 @@ Rules: display headings line-height 0.86–1.0 and tracking −0.035em; body 12�
 ## Layout
 
 - Shell: 1180px max, 48px gutters (28px on phones).
-- Builder: ledger column + 356px sticky tally on desktop; one column and a fixed thumb bar below 1050px.
+- Builder: bill amount first, then the table, then the split. Ledger column + 356px sticky tally on desktop; one column and a fixed thumb bar below 1050px.
+- The default path is a single big amount, a live equal-share strip, and a next-step button; item-by-item is a quiet text action inside The check.
+- Method grid shows three choices by default (Equal, Custom, Percent); By item joins only in item mode.
 - Result: intro + 566px paper check side by side; stacked on mobile, intro compressed.
 - Section panels are separated by a single hairline and air, not nested cards.
 - Touch targets: 44–48px for primary actions, 38px for compact chips on phones.
 
 ## Components
 
-- **Step headers:** brass index (`01`), display-serif title, one-line instruction. Numbers are functional sequence, not decoration.
+- **Step headers:** brass index (`01`), display-serif title, one-line instruction. Numbers follow the fast path: check, table, split.
 - **Person rows:** seat number, tonal monogram, borderless name field, quiet remove.
 - **Money field:** oversized mono figure over a rule; focus turns the rule brass.
 - **Tip chips / method tiles / payer chips:** `aria-pressed` toggles with brass fill or brass border; shared 8px radius language.
-- **Tally panel:** oxblood-black leather gradient, brass binder clip, live dot, mono total, per-person lines, single brass CTA.
+- **Tally panel:** oxblood-black leather gradient, brass binder clip, live dot, mono total, per-person lines, single CTA that switches between a brass “Review” and an outlined next-step label (“Add the bill total”, “Add the table”, “Assign every item”, “Finish the split”) which scrolls to the missing input.
+- **Quick share strip:** after the amount, an inset brass row shows the equal share (or the exact cent range) so the first useful number appears before names are typed.
 - **Paper check:** scalloped top/bottom edges, double rule under the total, dotted guest lines, oxblood `PAID` stamp, mono amounts, tiny uppercase provenance footer.
 - **Share dialog:** paper QR card on a dimmed, blurred backdrop; 232px QR; one action.
 - **Toast:** paper chip with a check mark, 2.8s.
@@ -69,5 +72,5 @@ One authored moment: the result check settles onto the table (`translateY(16px) 
 
 - ≤1050px: one column; tally becomes the fixed bottom bar with total + review.
 - ≤820px: hero stacks; result actions collapse to primary + summary + QR/link.
-- ≤640px: panels lose side padding; methods become a single column; inputs are 16px; result intro tightens so the check total is inside the first phone viewport.
+- ≤640px: panels lose side padding; methods become a single column; inputs are 16px; result intro tightens so the check total is inside the first phone viewport. The thumb bar repeats the total, the equal share, and the next step.
 - ≤380px: type scales down; chips compress; no horizontal overflow at 320px.

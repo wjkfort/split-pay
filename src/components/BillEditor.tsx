@@ -14,9 +14,9 @@ import {
   switchMode,
   toggleItemPerson,
 } from '../lib/state';
-import { Avatar } from './Avatar';
-import { PlusIcon, TrashIcon } from './Icons';
-import { FieldNote, SectionHead } from './Section';
+import { Avatar, initialsFor } from './Avatar';
+import { ArrowLeftIcon, PlusIcon, ReceiptIcon, TrashIcon } from './Icons';
+import { SectionHead } from './Section';
 
 const TIP_PRESETS = [0, 15, 18, 20, 25];
 
@@ -29,63 +29,87 @@ export function BillEditor({
   setState: Dispatch<SetStateAction<SplitState>>;
   model: SplitResult;
 }) {
-  const issue = model.issues.find((entry) => entry.target === 'bill' || entry.target === 'items');
-
   const update = (patch: Partial<SplitState>) => setState((previous) => ({ ...previous, ...patch }));
 
+  const shareCents = state.people.map((person) => model.shares[person.id] ?? 0);
+  const showQuickShare =
+    model.effectiveSplit === 'equal' && model.totals.total > 0 && shareCents.length > 0;
+  const minShare = showQuickShare ? Math.min(...shareCents) : 0;
+  const maxShare = showQuickShare ? Math.max(...shareCents) : 0;
+
+  const quickShare = showQuickShare ? (
+    <div className="quick-share">
+      <span className="quick-share-label">
+        Equal share
+        <small>
+          {state.people.length} {state.people.length === 1 ? 'person' : 'people'}
+        </small>
+      </span>
+      <span className="quick-share-value">
+        {minShare === maxShare ? formatMoney(minShare) : `${formatMoney(minShare)}–${formatMoney(maxShare)}`}
+        <small>each</small>
+      </span>
+    </div>
+  ) : null;
+
   return (
-    <section className="panel" aria-labelledby="bill-title">
+    <section className="panel" id="bill-section" aria-labelledby="bill-title">
       <SectionHead
-        step="02"
+        step="01"
         id="bill-title"
         title="The check"
-        copy="One total, or every plate. Tip and tax are handled here."
+        copy="Start with the bill. Tip and tax settle here."
         aside={<span className="binary-label">{state.mode === 'total' ? 'Total' : 'Items'}</span>}
       />
 
-      <div className="mode-tabs" role="group" aria-label="How to enter the bill">
-        <button
-          type="button"
-          aria-pressed={state.mode === 'total'}
-          className="mode-tab"
-          onClick={() => setState((previous) => switchMode(previous, 'total'))}
-        >
-          One total
-        </button>
-        <button
-          type="button"
-          aria-pressed={state.mode === 'items'}
-          className="mode-tab"
-          onClick={() => setState((previous) => switchMode(previous, 'items'))}
-        >
-          Item by item
-        </button>
-      </div>
-
       {state.mode === 'total' ? (
-        <div
-          className="bill-total-field"
-        >
-          <label htmlFor="bill-amount">Bill subtotal</label>
-          <div className="big-money">
-            <span aria-hidden="true">$</span>
-            <input
-              id="bill-amount"
-              value={state.bill}
-              onChange={(event) => update({ bill: sanitiseMoneyInput(event.target.value) })}
-              onBlur={() => update({ bill: normaliseMoneyInput(state.bill) })}
-              placeholder="0.00"
-              inputMode="decimal"
-              autoComplete="off"
-              aria-describedby="bill-amount-hint"
-            />
+        <>
+          <div className="bill-total-field">
+            <label htmlFor="bill-amount">Bill amount</label>
+            <div className="big-money">
+              <span aria-hidden="true">$</span>
+              <input
+                id="bill-amount"
+                value={state.bill}
+                onChange={(event) => update({ bill: sanitiseMoneyInput(event.target.value) })}
+                onBlur={() => update({ bill: normaliseMoneyInput(state.bill) })}
+                placeholder="0.00"
+                inputMode="decimal"
+                autoComplete="off"
+                aria-describedby="bill-amount-hint"
+              />
+            </div>
+            <p id="bill-amount-hint" className="field-hint">
+              Before tip and tax.
+            </p>
           </div>
-          <p id="bill-amount-hint" className="field-hint">
-            Before tip and tax.
-          </p>
-        </div>
+
+          {quickShare}
+
+          <div className="bill-mode-switch">
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => setState((previous) => switchMode(previous, 'items'))}
+            >
+              <ReceiptIcon size={14} />
+              Split by item instead
+            </button>
+          </div>
+        </>
       ) : (
         <div>
+          <div className="bill-mode-switch bill-mode-back">
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => setState((previous) => switchMode(previous, 'total'))}
+            >
+              <ArrowLeftIcon size={14} />
+              Use one total
+            </button>
+          </div>
+
           <ul className="item-list">
             {state.items.map((item, index) => {
               const assignedCount = item.assigned.filter((id) =>
@@ -161,19 +185,20 @@ export function BillEditor({
                       {state.people.map((person, personIndex) => {
                         const on = item.assigned.includes(person.id);
                         const label = personName(person, personIndex);
+                        const initials = initialsFor(person.name, personIndex);
                         return (
                           <button
                             type="button"
                             className={`assignee ${on ? 'is-on' : ''}`}
                             key={person.id}
                             aria-pressed={on}
-                            aria-label={`${on ? 'Remove' : 'Add'} ${label} for ${itemLabel}`}
+                            aria-label={`${initials} ${label} — ${on ? 'remove from' : 'add to'} ${itemLabel}`}
                             title={label}
                             onClick={() =>
                               setState((previous) => toggleItemPerson(previous, item.id, person.id))
                             }
                           >
-                            <Avatar name={person.name} index={personIndex} size="xs" />
+                            <Avatar name={person.name} index={personIndex} size="xs" />{' '}
                             <span>{person.name.trim().split(/\s+/)[0] || `Guest ${personIndex + 1}`}</span>
                           </button>
                         );
@@ -211,7 +236,7 @@ export function BillEditor({
           </ul>
 
           <div className="items-footer">
-            <button type="button" className="add-row" onClick={() => setState(addItem)}>
+            <button id="bill-add-item" type="button" className="add-row" onClick={() => setState(addItem)}>
               <PlusIcon size={18} />
               Add an item
             </button>
@@ -219,6 +244,8 @@ export function BillEditor({
               Subtotal <strong>{formatMoney(model.totals.subtotal)}</strong>
             </span>
           </div>
+
+          {quickShare}
         </div>
       )}
 
@@ -347,10 +374,6 @@ export function BillEditor({
           <span>{formatMoney(model.totals.total)}</span>
         </div>
       </div>
-
-      {issue ? (
-        <FieldNote tone={issue.target === 'items' ? 'error' : 'hint'}>{issue.message}</FieldNote>
-      ) : null}
     </section>
   );
 }

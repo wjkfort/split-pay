@@ -26,11 +26,3 @@ export function SectionHead({
     </header>
   );
 }
-
-export function FieldNote({ children, tone = 'error' }: { children: ReactNode; tone?: 'error' | 'hint' | 'good' }) {
-  return (
-    <p className={`field-note field-note-${tone}`} role={tone === 'error' ? 'alert' : undefined}>
-      {children}
-    </p>
-  );
-}

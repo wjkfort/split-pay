@@ -40,17 +40,17 @@ export function computeSplit(state: SplitState): SplitResult {
   const shares: Record<string, number> = {};
   for (const person of state.people) shares[person.id] = 0;
 
-  if (state.people.length < 2) {
-    issues.push({ target: 'people', message: 'Add at least two people to split the check.' });
-  }
-  if (state.people.some((person) => person.name.trim() === '')) {
-    issues.push({ target: 'people', message: 'Give everyone at the table a name.' });
-  }
   if (totals.subtotal <= 0) {
     issues.push({
       target: 'bill',
       message: state.mode === 'items' ? 'Add the first item to start the check.' : 'Add the bill total to see each share.',
     });
+  }
+  if (state.people.length < 2) {
+    issues.push({ target: 'people', message: 'Add at least two people to split the check.' });
+  }
+  if (state.people.some((person) => person.name.trim() === '')) {
+    issues.push({ target: 'people', message: 'Give everyone at the table a name.' });
   }
 
   let unassigned = 0;

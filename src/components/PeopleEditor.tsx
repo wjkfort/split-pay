@@ -1,28 +1,24 @@
 import type { Dispatch, SetStateAction } from 'react';
-import type { SplitResult, SplitState } from '../lib/types';
+import type { SplitState } from '../lib/types';
 import { addPerson, MAX_PEOPLE, personName, removePerson } from '../lib/state';
 import { Avatar } from './Avatar';
 import { PlusIcon, TrashIcon } from './Icons';
-import { FieldNote, SectionHead } from './Section';
+import { SectionHead } from './Section';
 
 export function PeopleEditor({
   state,
   setState,
-  model,
 }: {
   state: SplitState;
   setState: Dispatch<SetStateAction<SplitState>>;
-  model: SplitResult;
 }) {
-  const issue = model.issues.find((entry) => entry.target === 'people');
-
   return (
-    <section className="panel" aria-labelledby="people-title">
+    <section className="panel" id="people-section" aria-labelledby="people-title">
       <SectionHead
-        step="01"
+        step="02"
         id="people-title"
         title="The table"
-        copy="Who shared the meal? Two names minimum."
+        copy="Who's at the table? Two names minimum."
         aside={
           <span className="table-count">
             {state.people.length}
@@ -83,7 +79,6 @@ export function PeopleEditor({
         <span className="seat-limit">2–{MAX_PEOPLE} people</span>
       </div>
 
-      {issue ? <FieldNote tone="hint">{issue.message}</FieldNote> : null}
     </section>
   );
 }

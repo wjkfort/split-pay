@@ -143,11 +143,12 @@ export function assignEveryone(state: SplitState, itemId: string): SplitState {
 }
 
 export function switchMode(state: SplitState, mode: BillMode): SplitState {
-  return {
-    ...state,
-    mode,
-    split: mode === 'total' && state.split === 'item' ? 'equal' : state.split,
-  };
+  if (mode === 'items') {
+    // Entering item mode is a deliberate choice to track plates, so by-item is
+    // the only method that makes use of the new detail.
+    return { ...state, mode, split: 'item' };
+  }
+  return { ...state, mode, split: state.split === 'item' ? 'equal' : state.split };
 }
 
 export function encodeState(state: SplitState): string {

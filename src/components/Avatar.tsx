@@ -6,7 +6,7 @@ function hashName(name: string, index: number): number {
   return hash % TONES;
 }
 
-function initialsFor(name: string, index: number): string {
+export function initialsFor(name: string, index: number): string {
   const trimmed = name.trim();
   if (!trimmed) return String(index + 1).padStart(2, '0');
   const parts = trimmed.split(/\s+/).filter(Boolean);

@@ -201,7 +201,7 @@ input:focus-visible {
 /* ---------- Hero ---------- */
 
 .hero {
-  padding: clamp(56px, 8.2vw, 116px) 0 clamp(38px, 5.6vw, 72px);
+  padding: clamp(44px, 6.4vw, 88px) 0 clamp(28px, 4vw, 52px);
 }
 
 .hero-grid {
@@ -530,63 +530,76 @@ input:focus-visible {
   line-height: 1.5;
 }
 
-.field-note {
-  margin: 14px 0 0;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink-dim);
-  font-size: 11.5px;
-  line-height: 1.5;
-}
-
-.field-note-error {
-  color: #efb8a8;
-  border-color: rgba(227, 162, 146, 0.24);
-  background: rgba(138, 56, 48, 0.09);
-}
-
-.field-note-hint {
-  color: var(--ink-dim);
-  background: rgba(242, 234, 219, 0.025);
-}
-
-.field-note-good {
-  color: var(--sage);
-  border-color: rgba(168, 184, 157, 0.2);
-  background: rgba(168, 184, 157, 0.06);
-}
-
 /* ---------- Bill ---------- */
 
-.mode-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  background: var(--field);
+.quick-share {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(217, 174, 104, 0.2);
+  border-radius: 9px;
+  background: rgba(217, 174, 104, 0.045);
 }
 
-.mode-tab {
-  min-height: 39px;
-  border: 0;
-  border-radius: 8px;
+.quick-share-label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  color: var(--brass);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.quick-share-label small {
   color: var(--ink-faint);
-  background: transparent;
-  font-size: 12.5px;
-  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  font-family: var(--font-ui);
+  font-size: 9.5px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
-.mode-tab[aria-pressed='true'] {
-  color: var(--ink);
-  background: var(--panel-raised);
-  box-shadow: inset 0 0 0 1px var(--line);
+.quick-share-value {
+  color: var(--brass);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-.mode-tab:hover:not([aria-pressed='true']) {
-  color: var(--ink-dim);
+.quick-share-value small {
+  margin-left: 6px;
+  color: var(--ink-faint);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bill-mode-switch {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 9px;
+}
+
+.bill-mode-switch .text-button {
+  color: var(--ink-faint);
+  font-size: 10px;
+}
+
+.bill-mode-switch .text-button:hover {
+  color: var(--brass-bright);
+}
+
+.bill-mode-back {
+  justify-content: flex-start;
+  margin-top: 0;
+  margin-bottom: 10px;
 }
 
 .bill-total-field {
@@ -1015,8 +1028,12 @@ input:focus-visible {
 
 .methods {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.methods--four {
+  grid-template-columns: 1fr 1fr;
 }
 
 .method {
@@ -1034,7 +1051,7 @@ input:focus-visible {
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
-.method:hover:not(:disabled) {
+.method:hover {
   border-color: var(--line-strong);
   color: var(--ink);
 }
@@ -1044,9 +1061,6 @@ input:focus-visible {
   background: linear-gradient(140deg, rgba(217, 174, 104, 0.11), rgba(217, 174, 104, 0.025));
 }
 
-.method:disabled {
-  opacity: 0.34;
-}
 
 .method-icon {
   display: grid;
@@ -1598,6 +1612,19 @@ input:focus-visible {
   color: var(--brass-bright);
   border-color: rgba(217, 174, 104, 0.5);
   background: rgba(217, 174, 104, 0.035);
+}
+
+.btn-next {
+  color: var(--brass-bright);
+  border-color: rgba(217, 174, 104, 0.38);
+  background: rgba(217, 174, 104, 0.06);
+  box-shadow: none;
+}
+
+.btn-next:hover {
+  color: var(--brass-ink);
+  border-color: var(--brass);
+  background: var(--brass);
 }
 
 .btn-icon {
@@ -2370,13 +2397,12 @@ input:focus-visible {
     font-variant-numeric: tabular-nums;
   }
 
-  .mobile-total em {
-    overflow: hidden;
-    color: var(--amber);
+  .mobile-total .mobile-each {
+    color: var(--brass);
+    font-family: var(--font-mono);
     font-size: 8px;
-    font-style: normal;
-    letter-spacing: 0.02em;
-    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
     white-space: nowrap;
   }
 
@@ -2415,7 +2441,7 @@ input:focus-visible {
   }
 
   .hero {
-    padding-top: 54px;
+    padding-top: 38px;
   }
 
   .hero-grid {
@@ -2461,7 +2487,7 @@ input:focus-visible {
   }
 
   .hero {
-    padding: 46px 0 34px;
+    padding: 34px 0 24px;
   }
 
   .hero h1 {

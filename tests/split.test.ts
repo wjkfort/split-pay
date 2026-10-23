@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { allocateEvenly, allocateProportionally, formatMoney, parseMoney, parsePercent } from '../src/lib/money';
 import { computeSplit, computeTransfers, minimiseTransfers } from '../src/lib/split';
-import { buildSummary, createInitialState, decodeState, encodeState, seedCustom, seedPercents } from '../src/lib/state';
+import {
+  buildSummary,
+  createInitialState,
+  decodeState,
+  encodeState,
+  seedCustom,
+  seedPercents,
+  switchMode,
+} from '../src/lib/state';
 import type { SplitState } from '../src/lib/types';
 
 function makeState(names: string[], overrides: Partial<SplitState> = {}): SplitState {
@@ -45,6 +53,11 @@ describe('money', () => {
 });
 
 describe('equal and totals', () => {
+  it('asks for the bill first in the fast-start flow', () => {
+    const state = makeState(['', ''], { bill: '', tipPct: '0' });
+    expect(computeSplit(state).issues[0]?.target).toBe('bill');
+  });
+
   it('splits a check equally', () => {
     const state = makeState(['Alex', 'Sam', 'Jo'], { bill: '100.00', tipPct: '0' });
     const model = computeSplit(state);
@@ -74,6 +87,13 @@ describe('equal and totals', () => {
 });
 
 describe('itemized split', () => {
+  it('uses by-item when entering item mode from an equal split', () => {
+    const state = makeState(['Alex', 'Sam'], { split: 'equal', mode: 'total' });
+    expect(switchMode(state, 'items').split).toBe('item');
+    expect(switchMode({ ...state, split: 'percent' }, 'items').split).toBe('item');
+    expect(switchMode({ ...state, mode: 'items', split: 'item' }, 'total').split).toBe('equal');
+  });
+
   it('splits a shared item and adds tip proportionally', () => {
     const state = makeState(['Alex', 'Sam', 'Jo'], {
       mode: 'items',

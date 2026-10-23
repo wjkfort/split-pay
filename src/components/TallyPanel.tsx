@@ -7,14 +7,17 @@ import { ArrowRightIcon, LockIcon } from './Icons';
 export function TallyPanel({
   state,
   model,
-  onReview,
+  ready,
+  ctaLabel,
+  onAction,
 }: {
   state: SplitState;
   model: SplitResult;
-  onReview: () => void;
+  ready: boolean;
+  ctaLabel: string;
+  onAction: () => void;
 }) {
-  const ready = model.issues.length === 0;
-  const firstIssue = model.issues[0];
+  const allocationIssue = model.issues.find((entry) => entry.target === 'allocation');
   const tipBps = parsePercent(state.tipPct);
 
   return (
@@ -70,18 +73,17 @@ export function TallyPanel({
         <span className="tally-payer-name">{state.payer ? nameFor(state, state.payer) : 'Not set'}</span>
       </div>
 
-      {!ready && firstIssue ? <p className="tally-issue">{firstIssue.message}</p> : null}
+      {allocationIssue ? <p className="tally-issue">{allocationIssue.message}</p> : null}
       {ready && state.payer === null ? (
         <p className="tally-issue">Pick who paid the check to show who pays whom.</p>
       ) : null}
 
       <button
         type="button"
-        className="btn btn-primary tally-cta"
-        onClick={onReview}
-        disabled={!ready}
+        className={`btn ${ready ? 'btn-primary' : 'btn-next'} tally-cta`}
+        onClick={onAction}
       >
-        Review the split
+        {ctaLabel}
         <ArrowRightIcon size={18} />
       </button>
 

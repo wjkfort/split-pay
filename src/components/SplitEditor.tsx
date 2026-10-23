@@ -29,6 +29,7 @@ export function SplitEditor({
 }) {
   const allocationIssue = model.issues.find((entry) => entry.target === 'allocation');
   const method = METHODS.find((entry) => entry.key === model.effectiveSplit) ?? METHODS[0];
+  const methods = METHODS.filter((entry) => entry.key !== 'item' || state.mode === 'items');
   const isPercent = state.split === 'percent';
   const showAllocation = model.effectiveSplit === 'custom' || model.effectiveSplit === 'percent';
 
@@ -42,29 +43,25 @@ export function SplitEditor({
     );
 
   return (
-    <section className="panel" aria-labelledby="split-title">
+    <section className="panel" id="split-section" aria-labelledby="split-title">
       <SectionHead
         step="03"
         id="split-title"
         title="The split"
-        copy="Choose how the table divides it. Every cent is accounted for."
+        copy="Choose how to divide it. Every cent is accounted for."
         aside={<span className="binary-label">{method.title}</span>}
       />
 
-      <div className="methods" role="group" aria-label="Split method">
-        {METHODS.map((entry) => {
+      <div className={`methods ${methods.length === 4 ? 'methods--four' : ''}`} role="group" aria-label="Split method">
+        {methods.map((entry) => {
           const Icon = entry.icon;
-          const disabled = entry.key === 'item' && state.mode !== 'items';
           const checked = model.effectiveSplit === entry.key;
           return (
             <button
               type="button"
               aria-pressed={checked}
-              aria-disabled={disabled}
               key={entry.key}
               className={`method ${checked ? 'is-on' : ''}`}
-              disabled={disabled}
-              title={disabled ? 'Switch to item by item to use this split' : undefined}
               onClick={() => setState((previous) => withSplitMethod(previous, entry.key))}
             >
               <span className="method-icon">
@@ -72,7 +69,7 @@ export function SplitEditor({
               </span>
               <span className="method-copy">
                 <strong>{entry.title}</strong>
-                <small>{disabled ? 'Item by item only' : entry.copy}</small>
+                <small>{entry.copy}</small>
               </span>
               <span className="method-check" aria-hidden="true">
                 <CheckIcon size={13} />
@@ -181,7 +178,7 @@ export function SplitEditor({
             <ReceiptIcon size={18} />
           </span>
           <p>
-            Tip and tax are spread by what each person ordered. Assign every item above, or use{' '}
+            Tip and tax follow the plates. Assign every item above, or use{' '}
             <button
               type="button"
               className="text-button inline-text-button"
@@ -197,7 +194,7 @@ export function SplitEditor({
       <div className="payer">
         <div className="payer-head">
           <h3>Who covered the check?</h3>
-          <p>We&rsquo;ll point every transfer at them. Skip this if nobody needs to pay anyone back.</p>
+          <p>We&rsquo;ll point every transfer at them.</p>
         </div>
         <div className="payer-options">
           {state.people.map((person, index) => {
