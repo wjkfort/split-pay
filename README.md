@@ -4,7 +4,8 @@
 
 Split one restaurant check fairly, on a phone, in under a minute. No account, no database: the entire check travels inside a single shareable link.
 
-**Live:** https://dinner-split.pages.dev  
+**Live:** https://dinnersplit.app  
+**Pages fallback:** https://dinner-split.pages.dev  
 Built as a static React app for **Cloudflare Pages free tier**.
 
 ## Preview
@@ -83,7 +84,7 @@ npm run deploy
 wrangler pages deploy dist --project-name dinner-split
 ```
 
-Project settings live in `wrangler.jsonc`. The first deploy creates the Pages project; the production URL will be:
+Project settings live in `wrangler.jsonc`. The first deploy creates the Pages project; the Pages URL is:
 
 ```
 https://dinner-split.pages.dev
@@ -100,7 +101,7 @@ If that project name is taken on your account, change `name` in `wrangler.jsonc`
 3. `npm run build`
 4. on `main` only: `wrangler pages deploy dist --project-name=dinner-split --branch=main`
 
-Pull requests run the checks without deploying. The workflow uses direct upload to the existing Pages project, so the production URL stays `https://dinner-split.pages.dev`.
+Pull requests run the checks without deploying. The workflow uses direct upload to the existing Pages project. The production domain is `https://dinnersplit.app`; the Pages fallback is `https://dinner-split.pages.dev`.
 
 Add these repository secrets under **Settings → Secrets and variables → Actions**:
 
