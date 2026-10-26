@@ -1,0 +1,54 @@
+name: CI/CD
+
+# Required repository secrets:
+#   CLOUDFLARE_API_TOKEN  — Cloudflare API token with Account → Cloudflare Pages → Edit
+#   CLOUDFLARE_ACCOUNT_ID — the Cloudflare account ID that owns the dinner-split project
+#
+# Pull requests run tests + build only. Pushes to main (and manual dispatches on
+# main) deploy the existing Cloudflare Pages project, preserving dinner-split.pages.dev.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-and-deploy:
+    name: Test, build, deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: npx wrangler pages deploy dist --project-name=dinner-split --branch=main --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

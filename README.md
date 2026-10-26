@@ -89,6 +89,26 @@ https://dinner-split.pages.dev
 
 If that project name is taken on your account, change `name` in `wrangler.jsonc` and the `--project-name` in the deploy script.
 
+### CI/CD
+
+`.github/workflows/deploy.yml` runs on every push to `main`, every pull request, and manual dispatch:
+
+1. `npm ci`
+2. `npm test`
+3. `npm run build`
+4. on `main` only: `wrangler pages deploy dist --project-name=dinner-split --branch=main`
+
+Pull requests run the checks without deploying. The workflow uses direct upload to the existing Pages project, so the production URL stays `https://dinner-split.pages.dev`.
+
+Add these repository secrets under **Settings → Secrets and variables → Actions**:
+
+| Secret | Value |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | API token with **Account → Cloudflare Pages → Edit**, scoped to the account |
+| `CLOUDFLARE_ACCOUNT_ID` | The Cloudflare account ID that owns `dinner-split` |
+
+To create the API token: Cloudflare dashboard → **My Profile → API Tokens → Create Token → Custom token**, permissions **Account → Cloudflare Pages → Edit**, account resources **Include → your account**. Copy the token once; it is not shown again. Do not commit it.
+
 ### Hosting files
 
 - `public/_redirects` — SPA fallback for `/s/*`
