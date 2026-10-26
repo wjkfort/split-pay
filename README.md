@@ -69,6 +69,13 @@ The whole document is one `SplitState` object:
 - The builder can be reopened from a result with **Edit this split** (`/?d=<payload>`).
 - There is no localStorage, cookie, or server-side bill storage.
 
+### 404 handling
+
+`public/404.html` is load-bearing. Cloudflare Pages treats a project **without** a top-level
+`404.html` as a single-page app and answers every unknown path with `200` plus `index.html`.
+Because the app only owns `/` and `/s/*`, keeping `404.html` makes everything else a real `404`
+while `/s` and `/s/*` continue to be rewritten to the app by `public/_redirects`.
+
 ## Deploy to Cloudflare Pages
 
 Requires a Cloudflare account with Pages access.

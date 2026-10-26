@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0a08" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="noindex" />
+    <title>404 — This check doesn't add up · DinnerSplit</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <style>
+      :root {
+        --bg: #0b0a08;
+        --panel: #12100d;
+        --panel-raised: #17130f;
+        --ink: #f2eadb;
+        --ink-dim: #bcb2a1;
+        --ink-faint: #a19787;
+        --line: rgba(242, 234, 219, 0.12);
+        --line-strong: rgba(242, 234, 219, 0.23);
+        --brass: #d9ae68;
+        --brass-bright: #eccb90;
+        --brass-ink: #1a1308;
+        --font-display: Georgia, 'Times New Roman', 'Iowan Old Style', serif;
+        --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--bg);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 32px 20px;
+        background-color: var(--bg);
+        background-image: url('/noise.png');
+        background-size: 180px 180px;
+        color: var(--ink);
+        font-family: var(--font-ui);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .check {
+        width: min(100%, 27rem);
+        padding: 34px 28px 28px;
+        background: var(--panel);
+        border: 1px solid var(--line-strong);
+        border-radius: 3px;
+        box-shadow:
+          0 1px 0 rgba(242, 234, 219, 0.06) inset,
+          0 24px 60px -30px rgba(0, 0, 0, 0.9);
+        text-align: center;
+      }
+
+      .wordmark {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+
+      .rule {
+        height: 1px;
+        margin: 18px 0 26px;
+        background: var(--line);
+      }
+
+      .code {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(3rem, 16vw, 4.25rem);
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        color: var(--brass);
+      }
+
+      h1 {
+        margin: 14px 0 0;
+        font-family: var(--font-display);
+        font-size: clamp(1.375rem, 5.5vw, 1.75rem);
+        font-weight: 400;
+        font-style: italic;
+        line-height: 1.25;
+        letter-spacing: 0.01em;
+        color: var(--ink);
+      }
+
+      .lede {
+        margin: 14px auto 0;
+        max-width: 24rem;
+        font-size: 0.9375rem;
+        line-height: 1.65;
+        color: var(--ink-dim);
+      }
+
+      .dashed {
+        height: 0;
+        margin: 26px 0 24px;
+        border: 0;
+        border-top: 1px dashed var(--line);
+      }
+
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 13px 22px;
+        border-radius: 2px;
+        background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+        color: var(--brass-ink);
+        font-family: var(--font-ui);
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        text-decoration: none;
+        transition: filter 120ms ease, transform 120ms ease;
+      }
+
+      .cta:hover {
+        filter: brightness(1.06);
+      }
+
+      .cta:active {
+        transform: translateY(1px);
+      }
+
+      .cta:focus-visible {
+        outline: 2px solid var(--brass-bright);
+        outline-offset: 3px;
+      }
+
+      .meta {
+        margin: 22px 0 0;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+
+      .meta a {
+        color: var(--ink-dim);
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .meta a:hover {
+        color: var(--ink);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .cta {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="check">
+      <p class="wordmark">DinnerSplit</p>
+      <div class="rule" aria-hidden="true"></div>
+      <p class="code">404</p>
+      <h1>This check doesn't add up.</h1>
+      <p class="lede">
+        The page you asked for isn't on the menu. The link may be mistyped, or a shared check
+        that never made it out of the kitchen.
+      </p>
+      <hr class="dashed" aria-hidden="true" />
+      <a class="cta" href="/">Back to the table</a>
+      <p class="meta"><a href="https://dinnersplit.app/">dinnersplit.app</a></p>
+    </main>
+  </body>
+</html>

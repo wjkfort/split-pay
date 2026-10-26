@@ -1,1 +1,7 @@
-/s/* /index.html 200
+# Shared checks live at /s/<payload>; the app reads the payload client-side.
+#
+# Target "/" rather than "/index.html": Pages 308-redirects any /index.html request
+# to /, and a "/* -> /index.html" rewrite is rejected as an infinite loop.
+# public/404.html is what keeps every other unknown path a real 404.
+/s / 200
+/s/* / 200
