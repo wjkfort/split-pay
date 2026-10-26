@@ -1,5 +1,7 @@
 # DinnerSplit
 
+[![CI/CD](https://github.com/wjkfort/split-pay/actions/workflows/deploy.yml/badge.svg)](https://github.com/wjkfort/split-pay/actions/workflows/deploy.yml)
+
 Split one restaurant check fairly, on a phone, in under a minute. No account, no database: the entire check travels inside a single shareable link.
 
 **Live:** https://dinner-split.pages.dev  
