@@ -30,7 +30,8 @@ Built as a static React app for **Cloudflare Pages free tier**.
 ## Stack
 
 - React 19 + TypeScript + Vite
-- No backend, no database, no analytics
+- No backend, no database. Cloudflare Web Analytics counts pageviews without cookies or
+  fingerprinting — aggregate numbers only, nothing tied to a person and nothing about the check
 - `lz-string` for compressed URL state
 - `qrcode.react` for QR codes
 - Self-hosted Instrument Serif, Archivo, and DM Mono (Fontsource)
