@@ -5,6 +5,16 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Content-Security-Policy: default-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'
 
+# Shared checks carry the whole bill in the URL — names, amounts, who paid.
+# They are nobody's search result, and the payload space is unbounded, so keep
+# every /s path out of the index. Header rather than meta because the SPA never
+# sets one, and rather than robots.txt because a blocked crawler never reads it.
+/s
+  X-Robots-Tag: noindex, nofollow
+
+/s/*
+  X-Robots-Tag: noindex, nofollow
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 

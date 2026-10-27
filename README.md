@@ -76,6 +76,16 @@ The whole document is one `SplitState` object:
 Because the app only owns `/` and `/s/*`, keeping `404.html` makes everything else a real `404`
 while `/s` and `/s/*` continue to be rewritten to the app by `public/_redirects`.
 
+### Indexing
+
+Only `/` is worth indexing. A shared check at `/s/*` carries the whole bill inside the URL —
+names, amounts, who paid — so `public/_headers` sends `X-Robots-Tag: noindex, nofollow` for
+`/s` and `/s/*`.
+
+`robots.txt` deliberately keeps `Allow: /`. A crawler blocked from `/s/` would never fetch the
+response, never see the header, and could still index the URL as a bare link with no content.
+Let it crawl, and let the header say noindex.
+
 ## Deploy to Cloudflare Pages
 
 Requires a Cloudflare account with Pages access.
