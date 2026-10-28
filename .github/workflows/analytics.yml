@@ -1,0 +1,56 @@
+name: Analytics
+
+# Reads the zone's traffic from the Cloudflare GraphQL API using the same
+# API token the deploy workflow already holds, so no analytics credential
+# ever leaves GitHub. Dispatch it by hand when you want the numbers:
+#
+#   gh workflow run analytics.yml
+#   gh run watch && gh run view --log
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  query:
+    runs-on: ubuntu-latest
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Query Cloudflare GraphQL
+        run: |
+          set -uo pipefail
+
+          api() {
+            curl -s -X POST https://api.cloudflare.com/client/v4/graphql \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data @-
+          }
+
+          ZONE=$(curl -s "https://api.cloudflare.com/client/v4/zones?name=dinnersplit.app" \
+            -H "Authorization: Bearer $CF_TOKEN" | jq -r '.result[0].id // empty')
+
+          echo "zone=$ZONE account=$CF_ACCOUNT"
+          [ -n "$ZONE" ] || { echo "zone lookup failed"; exit 1; }
+
+          SINCE48=$(date -u -d '-48 hours' +%Y-%m-%dT%H:%M:%SZ)
+          SINCE26=$(date -u -d '-26 hours' +%Y-%m-%dT%H:%M:%SZ)
+          echo "since48=$SINCE48 since26=$SINCE26"
+
+          echo "== hourly (48h) =="
+          q="query { viewer { zones(filter:{zoneTag:\"$ZONE\"}) { httpRequests1hGroups(limit:200, filter:{datetime_geq:\"$SINCE48\"}, orderBy:[datetime_ASC]) { dimensions { datetime } sum { requests pageViews bytes threats } uniq { uniques } } } } }"
+          jq -cn --arg q "$q" '{query:$q}' | api \
+            | jq -c '{errors, rows: .data.viewer.zones[0].httpRequests1hGroups}'
+
+          echo "== top paths (26h) =="
+          q="query { viewer { zones(filter:{zoneTag:\"$ZONE\"}) { httpRequestsAdaptiveGroups(limit:60, filter:{datetime_geq:\"$SINCE26\"}, orderBy:[count_DESC]) { count dimensions { clientRequestPath } } } } }"
+          jq -cn --arg q "$q" '{query:$q}' | api \
+            | jq -c '{errors, rows: .data.viewer.zones[0].httpRequestsAdaptiveGroups}'
+
+          echo "== rum pageviews (26h) =="
+          q="query { viewer { accounts(filter:{accountTag:\"$CF_ACCOUNT\"}) { rumPageloadEventsAdaptiveGroups(limit:50, filter:{datetime_geq:\"$SINCE26\"}, orderBy:[count_DESC]) { count dimensions { date path refererHost } } } } }"
+          jq -cn --arg q "$q" '{query:$q}' | api | jq -c '.'
