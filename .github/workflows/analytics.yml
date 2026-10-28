@@ -24,6 +24,9 @@ jobs:
         run: |
           set -uo pipefail
 
+          grit() {
+            curl -s "$@" -H "Authorization: Bearer $CF_TOKEN"
+          }
           api() {
             curl -s -X POST https://api.cloudflare.com/client/v4/graphql \
               -H "Authorization: Bearer $CF_TOKEN" \
@@ -31,26 +34,19 @@ jobs:
               --data @-
           }
 
-          ZONE=$(curl -s "https://api.cloudflare.com/client/v4/zones?name=dinnersplit.app" \
-            -H "Authorization: Bearer $CF_TOKEN" | jq -r '.result[0].id // empty')
-
-          echo "zone=$ZONE account=$CF_ACCOUNT"
-          [ -n "$ZONE" ] || { echo "zone lookup failed"; exit 1; }
-
-          SINCE48=$(date -u -d '-48 hours' +%Y-%m-%dT%H:%M:%SZ)
           SINCE26=$(date -u -d '-26 hours' +%Y-%m-%dT%H:%M:%SZ)
-          echo "since48=$SINCE48 since26=$SINCE26"
+          echo "== token verify =="
+          grit https://api.cloudflare.com/client/v4/user/tokens/verify | jq -c '{success, errors, status: .result.status}'
 
-          echo "== hourly (48h) =="
-          q="query { viewer { zones(filter:{zoneTag:\"$ZONE\"}) { httpRequests1hGroups(limit:200, filter:{datetime_geq:\"$SINCE48\"}, orderBy:[datetime_ASC]) { dimensions { datetime } sum { requests pageViews bytes threats } uniq { uniques } } } } }"
-          jq -cn --arg q "$q" '{query:$q}' | api \
-            | jq -c '{errors, rows: .data.viewer.zones[0].httpRequests1hGroups}'
+          echo "== zones visible to this token =="
+          grit https://api.cloudflare.com/client/v4/zones | jq -c '{success, errors, names: [.result[]?.name]}'
 
-          echo "== top paths (26h) =="
-          q="query { viewer { zones(filter:{zoneTag:\"$ZONE\"}) { httpRequestsAdaptiveGroups(limit:60, filter:{datetime_geq:\"$SINCE26\"}, orderBy:[count_DESC]) { count dimensions { clientRequestPath } } } } }"
-          jq -cn --arg q "$q" '{query:$q}' | api \
-            | jq -c '{errors, rows: .data.viewer.zones[0].httpRequestsAdaptiveGroups}'
+          echo "== pages projects =="
+          grit "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects" | jq -c '{success, errors, names: [.result[]?.name]}'
 
-          echo "== rum pageviews (26h) =="
+          echo "== rum sites =="
+          grit "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/rum/site_info/list" | jq -c '{success, errors, sites: [.result[]? | {host: .host, site_tag: .site_tag}]}'
+
+          echo "== rum graphql =="
           q="query { viewer { accounts(filter:{accountTag:\"$CF_ACCOUNT\"}) { rumPageloadEventsAdaptiveGroups(limit:50, filter:{datetime_geq:\"$SINCE26\"}, orderBy:[count_DESC]) { count dimensions { date path refererHost } } } } }"
           jq -cn --arg q "$q" '{query:$q}' | api | jq -c '.'
