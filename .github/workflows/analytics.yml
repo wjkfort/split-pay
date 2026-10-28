@@ -47,6 +47,17 @@ jobs:
           echo "== rum sites =="
           grit "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/rum/site_info/list" | jq -c '{success, errors, sites: [.result[]? | {host: .host, site_tag: .site_tag}]}'
 
+          echo "== rum dataset names =="
+          q='query { __schema { types { name } } }'
+          jq -cn --arg q "$q" '{query:$q}' | api | jq -c '[.data.__schema.types[].name | select(test("um"))]'
+
+          echo "== rum group type fields =="
+          for t in rumPageloadEventsAdaptiveGroups rumPageloadEventsAdaptiveGroupsDimensions; do
+            q="query { __type(name: \"$t\") { name fields { name } } }"
+            jq -cn --arg q "$q" '{query:$q}' | api
+            echo
+          done
+
           echo "== rum graphql =="
           q="query { viewer { accounts(filter:{accountTag:\"$CF_ACCOUNT\"}) { rumPageloadEventsAdaptiveGroups(limit:50, filter:{datetime_geq:\"$SINCE26\"}, orderBy:[count_DESC]) { count dimensions { date path refererHost } } } } }"
           jq -cn --arg q "$q" '{query:$q}' | api | jq -c '.'
