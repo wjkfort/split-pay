@@ -52,7 +52,7 @@ jobs:
           jq -cn --arg q "$q" '{query:$q}' | api | jq -c '[.data.__schema.types[].name | select(test("um"))]'
 
           echo "== rum group type fields =="
-          for t in rumPageloadEventsAdaptiveGroups rumPageloadEventsAdaptiveGroupsDimensions; do
+          for t in AccountRumPageloadEventsAdaptiveGroups AccountRumPageloadEventsAdaptiveGroupsDimensions; do
             q="query { __type(name: \"$t\") { name fields { name } } }"
             jq -cn --arg q "$q" '{query:$q}' | api
             echo
